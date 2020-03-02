@@ -1,7 +1,9 @@
 # HNU官微定时打卡程序
 
 下载到本地 git clone https://github.com/SheyQ/Clock-in.git
+
 打开文件 cd Clock-in
+
 编辑config.json
 ```
 {

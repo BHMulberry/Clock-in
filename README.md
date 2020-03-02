@@ -1,5 +1,7 @@
 # HNU官微定时打卡程序
 
+按正常人的标准打卡，使用后可以上官微自行确认。
+
 下载到本地 git clone https://github.com/SheyQ/Clock-in.git
 
 打开文件 cd Clock-in

@@ -5,5 +5,6 @@
     "RealProvince": "杜王町",
     "RealCity": "圣安地列斯",
     "RealCounty": "xx区",
-    "RealAddress": "xx街道404"
+    "RealAddress": "xx街道404",
+    "RandomTimeFluctuation":"true"
 }

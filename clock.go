@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"math/rand"
 )
 
 // LoginForm ...
@@ -61,19 +62,22 @@ type PostForm struct {
 }
 
 type data struct {
-	Time         string
-	Code         string
-	Password     string
-	RealProvince string
-	RealCity     string
-	RealCounty   string
-	RealAddress  string
+	Time         			string
+	Code         			string
+	Password     			string
+	RealProvince 			string
+	RealCity     			string
+	RealCounty   			string
+	RealAddress  			string
+	RandomTimeFluctuation 	string
 }
 
 const loginURL = "http://fangkong.hnu.edu.cn/api/v1/account/login"
 const addURL = "http://fangkong.hnu.edu.cn/api/v1/clockinlog/add"
 
 const timeLayout = "2006-01-02 15:04:05"
+
+const timeFluctuationRange = 1800
 
 func readJSON(filePath string) (result string) {
 	file, err := os.Open(filePath)
@@ -165,6 +169,10 @@ func main() {
 			now := time.Now()
 			next := now.Add(time.Hour * 24)
 			next = time.Date(next.Year(), next.Month(), next.Day(), h, m, s, 0, next.Location())
+			if config.RandomTimeFluctuation == "true"{
+				rand.Seed(time.Now().UnixNano())
+				next = next.Add(time.Second * time.Duration(rand.Intn(2*timeFluctuationRange)-timeFluctuationRange))
+			}
 			fmt.Println("下一次打卡时间为: ", next.Format(timeLayout))
 			nextTimer := time.NewTimer(next.Sub(now))
 			<-nextTimer.C

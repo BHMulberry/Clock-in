@@ -152,13 +152,23 @@ func main() {
 	m, _ := strconv.Atoi(config.Time[3:5])
 	s, _ := strconv.Atoi(config.Time[6:8])
 
+	var testFlag bool
+
+	if len(os.Args) > 1 && os.Args[1] == "test" {
+		testFlag = true
+	} else {
+		testFlag = false
+	}
+
 	for {
-		now := time.Now()
-		next := now.Add(time.Hour * 24)
-		next = time.Date(next.Year(), next.Month(), next.Day(), h, m, s, 0, next.Location())
-		fmt.Println("下一次打卡时间为: ", next.Format(timeLayout))
-		nextTimer := time.NewTimer(next.Sub(now))
-		<-nextTimer.C
+		if testFlag == false {
+			now := time.Now()
+			next := now.Add(time.Hour * 24)
+			next = time.Date(next.Year(), next.Month(), next.Day(), h, m, s, 0, next.Location())
+			fmt.Println("下一次打卡时间为: ", next.Format(timeLayout))
+			nextTimer := time.NewTimer(next.Sub(now))
+			<-nextTimer.C
+		}
 
 		bytes, _ := json.Marshal(loginForm)
 		loginInfo := strings.NewReader(string(bytes))
@@ -170,6 +180,11 @@ func main() {
 		header := loginResq.Header
 		cookies := header["Set-Cookie"]
 
+		if len(cookies) == 0 {
+			fmt.Println("登陆失败...请检查门户账号和密码")
+			return
+		}
+
 		index1 := strings.Index(cookies[0], "=")
 		index2 := strings.Index(cookies[0], ";")
 		index3 := strings.Index(cookies[3], "=")
@@ -178,9 +193,7 @@ func main() {
 		cookie1 := &http.Cookie{Name: "TOKEN", Value: cookies[0][index1+1 : index2]}
 		cookie2 := &http.Cookie{Name: ".ASPXAUTH", Value: cookies[3][index3+1 : index4]}
 
-		// bytes, _ = json.Marshal(postForm)
-		bytes, _ = json.MarshalIndent(postForm, "", "   ")
-		fmt.Println(string(bytes))
+		bytes, _ = json.Marshal(postForm)
 		addInfo := strings.NewReader(string(bytes))
 
 		addReq, _ := http.NewRequest("POST", addURL, addInfo)
@@ -197,5 +210,8 @@ func main() {
 		fmt.Println(addResq.Status)
 		bytes, _ = ioutil.ReadAll(addResq.Body)
 		fmt.Println(string(bytes))
+		if testFlag == true {
+			return
+		}
 	}
 }
